@@ -9,6 +9,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/vnscp-client" />
+            <option value="$PROJECT_DIR$/vnscp-server" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -1,19 +1,5 @@
-plugins {
-    id("java")
-}
-
-group = "de.daniel"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-}
-
-tasks.test {
-    useJUnitPlatform()
+subprojects {
+    apply(plugin = "java")
+    group = "de.uulm.in.vs.grn.vnscp"
+    version = "1.0"
 }
