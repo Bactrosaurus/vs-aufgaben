@@ -5,3 +5,4 @@ rootProject.name = projectName
 
 include("$projectName-client")
 include("$projectName-server")
+include("$projectName-common")
