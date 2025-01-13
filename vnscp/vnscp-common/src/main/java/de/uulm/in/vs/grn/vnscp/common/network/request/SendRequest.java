@@ -20,6 +20,7 @@ public class SendRequest extends VNSCPRequest {
     @Override
     void sendToVNSCP(OutputStream outputStream) throws IOException {
         outputStream.write("SEND VNSCP/1.0\r\n".getBytes(StandardCharsets.UTF_8));
+        // TODO: !!! Check if message is valid according to protocol specification !!!
         outputStream.write(("Text: " + this.message + "\r\n\r\n").getBytes(StandardCharsets.UTF_8));
         outputStream.flush();
     }

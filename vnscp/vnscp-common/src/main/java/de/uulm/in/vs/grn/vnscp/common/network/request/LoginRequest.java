@@ -20,6 +20,7 @@ public class LoginRequest extends VNSCPRequest {
     @Override
     void sendToVNSCP(OutputStream outputStream) throws IOException {
         outputStream.write("LOGIN VNSCP/1.0\r\n".getBytes(StandardCharsets.UTF_8));
+        // TODO: !!! Check if username is valid according to protocol specification !!!
         outputStream.write(("Username: " + this.username + "\r\n\r\n").getBytes(StandardCharsets.UTF_8));
         outputStream.flush();
     }
