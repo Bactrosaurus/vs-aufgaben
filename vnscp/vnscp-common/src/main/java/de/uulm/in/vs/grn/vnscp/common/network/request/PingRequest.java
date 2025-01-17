@@ -10,10 +10,10 @@ public class PingRequest extends VNSCPRequest {
         super(RequestType.PING);
     }
 
+
     @Override
-    void sendToVNSCP(OutputStream outputStream) throws IOException {
-        outputStream.write("PING VNSCP/1.0\r\n\r\n".getBytes(StandardCharsets.UTF_8));
-        outputStream.flush();
+    byte[] requestData() {
+        return "PING VNSCP/1.0\r\n\r\n".getBytes(StandardCharsets.UTF_8);
     }
 
 }

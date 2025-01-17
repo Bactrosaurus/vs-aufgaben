@@ -1,7 +1,6 @@
 package de.uulm.in.vs.grn.vnscp.common.network.request;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 public abstract class VNSCPRequest {
 
@@ -11,7 +10,7 @@ public abstract class VNSCPRequest {
         this.requestType = requestType;
     }
 
-    abstract void sendToVNSCP(OutputStream outputStream) throws IOException;
+    abstract byte[] requestData();
 
     public RequestType getRequestType() {
         return requestType;
