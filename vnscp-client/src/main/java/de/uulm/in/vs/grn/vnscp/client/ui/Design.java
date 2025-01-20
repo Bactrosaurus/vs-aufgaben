@@ -1,4 +1,4 @@
-package de.uulm.in.vs.grn.vnscp.client.utils;
+package de.uulm.in.vs.grn.vnscp.client.ui;
 
 
 import de.uulm.in.vs.grn.vnscp.client.Main;

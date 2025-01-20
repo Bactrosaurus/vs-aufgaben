@@ -4,8 +4,10 @@ import de.uulm.in.vs.grn.vnscp.client.network.CommandConnection;
 import de.uulm.in.vs.grn.vnscp.client.network.KeepAliveTask;
 import de.uulm.in.vs.grn.vnscp.client.network.PubSubConnection;
 import de.uulm.in.vs.grn.vnscp.client.network.VNSCPPacket;
+import de.uulm.in.vs.grn.vnscp.client.ui.ClientWindow;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class VNSCPClient {
 
@@ -14,13 +16,15 @@ public class VNSCPClient {
     private final KeepAliveTask keepAliveTask;
     private String latestError;
     private final String username;
+    private final ClientWindow clientWindow;
 
-    public VNSCPClient(String host, int commandPort, int pubSubPort, String username) throws IOException {
+    public VNSCPClient(ClientWindow clientWindow, String host, int commandPort, int pubSubPort, String username) throws IOException {
         this.commandConnection = new CommandConnection(host, commandPort);
         this.pubSubConnection = new PubSubConnection(host, pubSubPort);
         this.keepAliveTask = new KeepAliveTask();
         this.latestError = "";
         this.username = username;
+        this.clientWindow = clientWindow;
     }
 
     public boolean login() {
@@ -52,6 +56,28 @@ public class VNSCPClient {
                 this.latestError = loginFailure;
             }
         }
+
+        // Set initial ping to get all online users
+        VNSCPPacket initialPing = new VNSCPPacket(VNSCPPacket.PacketType.PING);
+        this.getCommandConnection().send(initialPing);
+        try {
+            initialPing = this.getCommandConnection().receive();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String[] onlineUsers = initialPing.getField("Usernames").split(",");
+        Arrays.stream(onlineUsers).forEach(clientWindow.getConnectedUsers()::addElement);
+
+        // Listen for incoming pub-sub messages
+        this.pubSubConnection.listen(message -> {
+            if (message.getPacketType() == VNSCPPacket.PacketType.EVENT) {
+                clientWindow.displayEvent(message.getField("Description"));
+            }
+
+            if (message.getPacketType() == VNSCPPacket.PacketType.MESSAGE) {
+                clientWindow.displayMessage(message.getField("Username"), message.getField("Text"));
+            }
+        });
 
         return loggedIn;
     }
@@ -125,6 +151,10 @@ public class VNSCPClient {
 
     public CommandConnection getCommandConnection() {
         return commandConnection;
+    }
+
+    public ClientWindow getClientWindow() {
+        return clientWindow;
     }
 
 }

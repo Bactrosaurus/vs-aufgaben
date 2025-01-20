@@ -23,7 +23,7 @@ public class KeepAliveTask {
                     VNSCPPacket pongResponse = client.getCommandConnection().receive();
 
                     if (pongResponse.getPacketType() == VNSCPPacket.PacketType.PONG) {
-                        System.out.println("PONG received. Users online: " + pongResponse.getField("Usernames"));
+                        System.out.println("PING sent, PONG received. Session kept alive.");
                     } else if (pongResponse.getPacketType() == VNSCPPacket.PacketType.EXPIRED) {
                         System.out.println("Session expired. Logging in again.");
                         client.login();

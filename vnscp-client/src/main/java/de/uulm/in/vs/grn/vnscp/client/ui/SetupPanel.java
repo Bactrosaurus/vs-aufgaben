@@ -1,10 +1,7 @@
 package de.uulm.in.vs.grn.vnscp.client.ui;
 
-import de.uulm.in.vs.grn.vnscp.client.utils.Design;
-
 import javax.swing.*;
 import java.awt.*;
-import java.io.InputStream;
 import java.util.Arrays;
 
 public class SetupPanel {
