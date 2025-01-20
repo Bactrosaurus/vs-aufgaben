@@ -57,6 +57,10 @@ public class VNSCPClient {
             }
         }
 
+        if (!loggedIn) {
+            return false;
+        }
+
         // Set initial ping to get all online users
         VNSCPPacket initialPing = new VNSCPPacket(VNSCPPacket.PacketType.PING);
         this.getCommandConnection().send(initialPing);
@@ -69,8 +73,7 @@ public class VNSCPClient {
 
         // Add connected users to user list in GUI
         Arrays.stream(onlineUsers).forEach(clientWindow.getConnectedUsers()::addElement);
-
-        return loggedIn;
+        return true;
     }
 
     public void initPubSubListener() {
