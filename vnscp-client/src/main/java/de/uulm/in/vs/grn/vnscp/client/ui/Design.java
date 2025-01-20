@@ -22,4 +22,10 @@ public class Design {
         return font;
     }
 
+    public static void apply(Component component) {
+        component.setFont(Design.getFont());
+        component.setBackground(Design.backgroundColor);
+        component.setForeground(Design.textColor);
+    }
+
 }

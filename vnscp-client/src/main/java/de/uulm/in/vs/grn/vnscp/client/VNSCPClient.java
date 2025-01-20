@@ -71,10 +71,12 @@ public class VNSCPClient {
         // Listen for incoming pub-sub messages
         this.pubSubConnection.listen(message -> {
             if (message.getPacketType() == VNSCPPacket.PacketType.EVENT) {
+                if (message.getField("Description") == null) return;
                 clientWindow.displayEvent(message.getField("Description"));
             }
 
             if (message.getPacketType() == VNSCPPacket.PacketType.MESSAGE) {
+                if (message.getField("Username") == null | message.getField("Text") == null) return;
                 clientWindow.displayMessage(message.getField("Username"), message.getField("Text"));
             }
         });
