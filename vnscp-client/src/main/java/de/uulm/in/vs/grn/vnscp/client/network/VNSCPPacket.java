@@ -35,47 +35,15 @@ public class VNSCPPacket {
         return sb.toString();
     }
 
-    /**
-     * @return Returns description of EVENT packet, otherwise null
-     */
-    public String getEventDescription() {
-        if (getPacketType() == PacketType.EVENT) {
-            return getField("Description");
-        }
-        return null;
-    }
-
-    /**
-     * @return Returns message of MESSAGE packet, otherwise null
-     */
-    public String getMessage() {
-        if (getPacketType() == PacketType.MESSAGE) {
-            return getField("Text");
-        }
-        return null;
-    }
-
-    /**
-     * @return Returns username of MESSAGE packet, otherwise null
-     */
-    public String getUsername() {
-        if (getPacketType() == PacketType.MESSAGE) {
-            return getField("Username");
-        }
-        return null;
-    }
-
     public static VNSCPPacket parse(String message) {
         String[] lines = message.split("\r\n");
         if (lines.length == 0 || lines[0].isEmpty()) {
             throw new IllegalArgumentException("Invalid message format: Empty message");
         }
-
         VNSCPPacket vnsMessage = getVnscpMessage(lines);
 
         // Parse fields
         parseMessage(lines, vnsMessage);
-
         return vnsMessage;
     }
 

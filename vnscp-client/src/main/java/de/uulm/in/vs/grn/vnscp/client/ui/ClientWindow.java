@@ -12,39 +12,79 @@ import java.net.UnknownHostException;
 
 public class ClientWindow {
 
-    private final JFrame frame;
-    private final JTextArea messageArea;
-    private final DefaultListModel<String> connectedUsers;
+    private JFrame frame;
+    private JTextArea messageArea;
+    private final DefaultListModel<String> connectedUsers = new DefaultListModel<>();
     private VNSCPClient client;
 
     public ClientWindow() {
-        this.frame = new JFrame("VNSCP Client");
-        this.frame.setResizable(true);
-        this.frame.setSize(800, 600);
-        this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        if (!performLogin()) {
+            System.exit(0); // Exit if login process fails or is canceled
+        }
 
-        this.connectedUsers = new DefaultListModel<>();
+        initializeUI();
+        client.initPubSubListener();
+    }
 
-        this.messageArea = new JTextArea();
-        this.messageArea.setEditable(false);
-        this.messageArea.setLineWrap(true);
-        this.messageArea.setWrapStyleWord(true);
-        this.messageArea.setMinimumSize(new Dimension(100, 100));
-        Design.apply(this.messageArea);
+    private boolean performLogin() {
+        SetupPanel setupPanel = new SetupPanel();
 
-        // user list
+        while (true) {
+            if (!setupPanel.open()) {
+                JOptionPane.showMessageDialog(null, "Invalid port numbers", "Error", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
+            if (setupPanel.getResult() != JOptionPane.OK_OPTION) {
+                return false; // User canceled the setup
+            }
+
+            if (!isValidUsername(setupPanel.getUsername())) {
+                JOptionPane.showMessageDialog(null, "Username is invalid", "Error", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
+            try {
+                this.client = new VNSCPClient(this, setupPanel.getHost(), setupPanel.getCommandPort(), setupPanel.getPubSubPort(), setupPanel.getUsername());
+            } catch (IOException e) {
+                String errorMessage = (e instanceof UnknownHostException) ? "Unknown host" : e.toString();
+                JOptionPane.showMessageDialog(null, errorMessage, "Initialization error", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
+            if (!this.client.login()) {
+                JOptionPane.showMessageDialog(null, this.client.getLatestError(), "Connection error", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
+            return true; // Login succeeded
+        }
+    }
+
+    private void initializeUI() {
+        frame = new JFrame("VNSCP Client");
+        frame.setResizable(true);
+        frame.setSize(800, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        messageArea = new JTextArea();
+        messageArea.setEditable(false);
+        messageArea.setLineWrap(true);
+        messageArea.setWrapStyleWord(true);
+        messageArea.setMinimumSize(new Dimension(100, 100));
+        VNSCPTheme.apply(messageArea);
+
         JList<String> userList = new JList<>(connectedUsers);
-        Design.apply(userList);
         userList.setMinimumSize(new Dimension(100, 100));
+        VNSCPTheme.apply(userList);
 
-        // make user list resizable
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(messageArea), new JScrollPane(userList));
         splitPane.setResizeWeight(0.5);
+        VNSCPTheme.apply(splitPane);
         frame.add(splitPane, BorderLayout.CENTER);
 
-        // Text entry field
         JTextField textField = new JTextField();
-        Design.apply(textField);
+        VNSCPTheme.apply(textField);
         textField.addActionListener((ActionEvent e) -> {
             if (!client.sendMessage(textField.getText())) {
                 JOptionPane.showMessageDialog(frame, this.client.getLatestError(), "Message error", JOptionPane.ERROR_MESSAGE);
@@ -53,55 +93,8 @@ public class ClientWindow {
             }
         });
 
-        frame.add(splitPane, BorderLayout.CENTER);
         frame.add(textField, BorderLayout.SOUTH);
 
-        // Show login panel
-        SetupPanel setupPanel = new SetupPanel();
-        while (true) {
-            if (!setupPanel.open()) {
-                JOptionPane.showMessageDialog(frame, "Invalid port numbers", "Error", JOptionPane.ERROR_MESSAGE);
-                continue;
-            }
-
-            if (setupPanel.getResult() != JOptionPane.OK_OPTION) {
-                System.exit(0);
-                break;
-            }
-
-            if (!isValidUsername(setupPanel.getUsername())) {
-                JOptionPane.showMessageDialog(frame, "Username is invalid", "Error", JOptionPane.ERROR_MESSAGE);
-                continue;
-            }
-
-            // Try to create client
-            try {
-                this.client = new VNSCPClient(this, setupPanel.getHost(), setupPanel.getCommandPort(), setupPanel.getPubSubPort(), setupPanel.getUsername());
-            } catch (IOException e) {
-                String errorMessage;
-                if (e instanceof UnknownHostException) {
-                    errorMessage = "Unknown host";
-                } else {
-                    errorMessage = e.toString();
-                }
-                JOptionPane.showMessageDialog(frame, errorMessage, "Initialization error", JOptionPane.ERROR_MESSAGE);
-                continue;
-            }
-
-            // Check if login failed
-            if (!this.client.login()) {
-                JOptionPane.showMessageDialog(frame, this.client.getLatestError(), "Connection error", JOptionPane.ERROR_MESSAGE);
-                continue;
-            }
-
-            // Client logged in
-            break;
-        }
-
-        // Client logged in and setup panel closed
-        frame.setTitle("VNSCP Client - " + setupPanel.getUsername());
-
-        // log out and close socket and io on window close
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -136,9 +129,7 @@ public class ClientWindow {
     }
 
     public void displayMessage(String username, String message) {
-        SwingUtilities.invokeLater(() -> {
-            messageArea.append("[" + username + "] " + message + "\r\n");
-        });
+        SwingUtilities.invokeLater(() -> messageArea.append("[" + username + "] " + message + "\r\n"));
     }
 
     public DefaultListModel<String> getConnectedUsers() {
@@ -146,3 +137,4 @@ public class ClientWindow {
     }
 
 }
+

@@ -36,9 +36,9 @@ public class SetupPanel {
         setupPanel.add(pubSubPortField);
 
         Arrays.stream(setupPanel.getComponents()).forEach(component -> {
-            component.setFont(Design.getFont());
-            component.setBackground(Design.backgroundColor);
-            component.setForeground(Design.textColor);
+            component.setFont(VNSCPTheme.getFont());
+            component.setBackground(VNSCPTheme.backgroundColor);
+            component.setForeground(VNSCPTheme.textColor);
         });
     }
 

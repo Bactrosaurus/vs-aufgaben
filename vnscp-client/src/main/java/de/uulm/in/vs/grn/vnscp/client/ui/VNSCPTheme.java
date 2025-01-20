@@ -6,7 +6,7 @@ import de.uulm.in.vs.grn.vnscp.client.Main;
 import java.awt.*;
 import java.io.InputStream;
 
-public class Design {
+public class VNSCPTheme {
 
     public static final Color backgroundColor = new Color(240, 240, 240); // Light gray background
     public static final Color textColor = new Color(75, 75, 75);
@@ -23,9 +23,9 @@ public class Design {
     }
 
     public static void apply(Component component) {
-        component.setFont(Design.getFont());
-        component.setBackground(Design.backgroundColor);
-        component.setForeground(Design.textColor);
+        component.setFont(VNSCPTheme.getFont());
+        component.setBackground(VNSCPTheme.backgroundColor);
+        component.setForeground(VNSCPTheme.textColor);
     }
 
 }
