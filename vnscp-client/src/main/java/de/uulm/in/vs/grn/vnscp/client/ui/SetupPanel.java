@@ -1,7 +1,11 @@
 package de.uulm.in.vs.grn.vnscp.client.ui;
 
+import de.uulm.in.vs.grn.vnscp.client.utils.Design;
+
 import javax.swing.*;
 import java.awt.*;
+import java.io.InputStream;
+import java.util.Arrays;
 
 public class SetupPanel {
 
@@ -23,15 +27,8 @@ public class SetupPanel {
         this.commandPortField = new JTextField();
         this.pubSubPortField = new JTextField();
 
-        Color backgroundColor = new Color(240, 240, 240); // Light gray background
-        Color textColor = new Color(75, 75, 75);
-        Font font = new Font("Default", Font.PLAIN, 14);
-
         setupPanel = new JPanel(new GridLayout(4, 1));
         setupPanel.setPreferredSize(new Dimension(300, 80));
-        setupPanel.setBackground(backgroundColor);
-        setupPanel.setFont(font);
-        setupPanel.setForeground(textColor);
         setupPanel.add(new JLabel("Username: "));
         setupPanel.add(usernameField);
         setupPanel.add(new JLabel("Host: "));
@@ -40,16 +37,28 @@ public class SetupPanel {
         setupPanel.add(commandPortField);
         setupPanel.add(new JLabel("PubSub-Port: "));
         setupPanel.add(pubSubPortField);
+
+        Arrays.stream(setupPanel.getComponents()).forEach(component -> {
+            component.setFont(Design.getFont());
+            component.setBackground(Design.backgroundColor);
+            component.setForeground(Design.textColor);
+        });
     }
 
-    public void open() {
+    public boolean open() {
         result = JOptionPane.showConfirmDialog(null, setupPanel, "Setup", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             username = usernameField.getText();
             host = hostField.getText();
-            commandPort = Integer.parseInt(commandPortField.getText());
-            pubSubPort = Integer.parseInt(pubSubPortField.getText());
+            try {
+                commandPort = Integer.parseInt(commandPortField.getText());
+                pubSubPort = Integer.parseInt(pubSubPortField.getText());
+            } catch (NumberFormatException e) {
+                return false;
+            }
         }
+
+        return true;
     }
 
     public int getCommandPort() {
@@ -66,10 +75,6 @@ public class SetupPanel {
 
     public String getHost() {
         return host;
-    }
-
-    public JPanel getSetupPanel() {
-        return setupPanel;
     }
 
     public int getResult() {
