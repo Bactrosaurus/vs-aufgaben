@@ -1,5 +1,6 @@
 package de.uulm.in.vs.grn.vnscp.client.network;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 

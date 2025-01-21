@@ -98,6 +98,14 @@ public class VNSCPClient {
             return false;
         }
 
+        // Make sure message is not empty
+        if (message.isEmpty()) {
+            String error = "Cannot send empty message!";
+            System.err.println(error);
+            this.latestError = error;
+            return false;
+        }
+
         try {
             VNSCPPacket sendMessage = new VNSCPPacket(VNSCPPacket.PacketType.SEND);
             sendMessage.addField("Text", message);
